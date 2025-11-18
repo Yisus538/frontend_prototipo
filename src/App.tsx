@@ -13,19 +13,12 @@ import type { Vista } from './interface/app.interface';
 export const App = () => {
 
   const { isAuthenticated, user, logout } = useAuth();
-
   const [vistaActual, setVistaActual] = useState<Vista>('dashboard');
 
-  const handleLogout = () => {
-    logout();
-  };
-  const handleNavegar = (vista: Vista) => {
-    setVistaActual(vista);
-  };
-  const handleVolverDashboard = () => {
-    setVistaActual('dashboard');
-  };
-
+  const handleLogout = () => logout();
+  const handleNavegar = (vista: Vista) => setVistaActual(vista);
+  const handleVolverDashboard = () => setVistaActual('dashboard');
+  
   if (!isAuthenticated) return <LoginPage />;
 
   switch (vistaActual) {
@@ -39,33 +32,23 @@ export const App = () => {
       );
     case 'registrar_tarjeta':
       return (
-        <RegistrarTarjetaPage
-          onVolver={handleVolverDashboard}
-        />
+        <RegistrarTarjetaPage onVolver={handleVolverDashboard} />
       );
     case 'consultar_no_autorizado':
       return (
-        <ConsultarNoAutorizadoPage
-          onVolver={handleVolverDashboard}
-        />
+        <ConsultarNoAutorizadoPage onVolver={handleVolverDashboard} />
       );
     case 'registrar_visita':
       return (
-        <RegistrarVisitaPage
-          onVolver={handleVolverDashboard}
-        />
+        <RegistrarVisitaPage onVolver={handleVolverDashboard} />
       );
     case 'registrar_no_autorizado':
       return (
-        <RegistrarNoAutorizadoPage
-          onVolver={handleVolverDashboard}
-        />
+        <RegistrarNoAutorizadoPage onVolver={handleVolverDashboard} />
       );
     case 'registrar_morador':
       return (
-        <RegistrarMoradorPage
-          onVolver={handleVolverDashboard}
-        />
+        <RegistrarMoradorPage onVolver={handleVolverDashboard} />
       );
 
     default:

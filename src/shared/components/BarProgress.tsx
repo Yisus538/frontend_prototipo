@@ -1,9 +1,5 @@
-type Step = 'BUSCAR_DNI' | 'REGISTRAR_DATOS' | 'EXITO';
+import type { BarProgressProps } from "../../interface/registro.interface";
 
-interface BarProgressProps {
-  step?: Step;
-  progress?: number;
-}
 
 export const BarProgress = ({ step, progress }: BarProgressProps) => {
   let progressWidth: string;

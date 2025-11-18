@@ -26,13 +26,9 @@ export function DashboardPage({ onLogout, usuario, onNavegar }: DashboardPagePro
   const menuItems = usuario.rol === 'admin' ? opcionesAdmin[paginaActual] : opcionesCentinela[paginaActual];
   const totalPaginas = usuario.rol === 'admin' ? 3 : 1;
 
-  const irSiguientePagina = () => {
-    setPaginaActual((prev) => Math.min(prev + 1, totalPaginas));
-  };
+  const irSiguientePagina = () => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas));
 
-  const irPaginaAnterior = () => {
-    setPaginaActual((prev) => Math.max(prev - 1, 1));
-  };
+  const irPaginaAnterior = () => setPaginaActual((prev) => Math.max(prev - 1, 1))
 
   const handleMenuClick = (opcion: string) => {
     if (opcion === "Registrar Tarjeta") {
@@ -60,7 +56,6 @@ export function DashboardPage({ onLogout, usuario, onNavegar }: DashboardPagePro
 
       <main className="flex flex-1 items-start justify-center p-10">
         <div className="grid w-full max-w-6xl grid-cols-1 gap-12 md:grid-cols-3">
-
           {/* Columna Izquierda */}
           <div className="flex flex-col space-y-2 md:col-span-1 pt-10">
             <h1 className="text-6xl font-bold text-[#1C2E10]">Inicio</h1>
