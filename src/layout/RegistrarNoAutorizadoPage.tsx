@@ -1,20 +1,20 @@
 import { useState } from 'react';
 import { Header } from '../shared/components/Header';
-import { useAuth } from '../context/AuthContext'; 
+import { useAuth } from '../context/AuthContext';
 import type { Props, Step } from '../interface/noAutorizado.interface';
-import { BarProgress } from '../shared/components/barProgress';
+import { BarProgress } from '../shared/components/BarProgress';
 
 
 
 export function RegistrarNoAutorizadoPage({ onVolver }: Props) {
-  const { token } = useAuth(); 
+  const { token } = useAuth();
   const [step, setStep] = useState<Step>('BUSCAR_DNI');
 
   const [dni, setDni] = useState('');
   const [nombre, setNombre] = useState('');
   const [motivo, setMotivo] = useState('');
   const [telefono, setTelefono] = useState('');
-  const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]); 
+  const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +31,7 @@ export function RegistrarNoAutorizadoPage({ onVolver }: Props) {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` 
+          'Authorization': `Bearer ${token}`
         }
       });
 
@@ -64,7 +64,7 @@ export function RegistrarNoAutorizadoPage({ onVolver }: Props) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` 
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ dni, nombre, motivo, telefono, fecha_reporte: fecha }),
       });
@@ -214,7 +214,7 @@ export function RegistrarNoAutorizadoPage({ onVolver }: Props) {
               </p>
             </div>
             <button
-              onClick={onVolver} 
+              onClick={onVolver}
               className="mt-10 w-full max-w-xs rounded-md bg-[#8F9E78] py-2 text-white font-medium shadow-md hover:bg-[#7A8C60]"
             >
               Salir
@@ -243,7 +243,7 @@ export function RegistrarNoAutorizadoPage({ onVolver }: Props) {
           <h1 className="text-2xl font-medium text-[#6B9080]">Registrar no Autorizado</h1>
         </div>
 
-        <BarProgress step={step}/>
+        <BarProgress step={step} />
 
         {error && (
           <div className="mb-6 rounded-md border border-red-300 bg-red-100 p-4 text-center text-red-800">

@@ -32,7 +32,6 @@ export function ConsultarNoAutorizadoPage({ onVolver }: Props) {
       } else if (response.status === 404) {
         setResultado(null);
       } else if (response.status === 401 || response.status === 403) {
-         // <-- 4. Manejar error si el token es inválido
         setErrorApi("Sesión expirada. Por favor, inicie sesión de nuevo.");
       } else {
         throw new Error('Error del servidor al buscar');

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Header } from '../shared/components/Header';
 import { useAuth } from '../context/AuthContext';
 import type { Props, Step } from '../interface/noAutorizado.interface';
-import { BarProgress } from '../shared/components/barProgress';
+import { BarProgress } from '../shared/components/BarProgress';
 
 
 export function RegistrarVisitaPage({ onVolver }: Props) {

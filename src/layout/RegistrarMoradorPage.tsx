@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
 import type { RegistrarTarjetaPageProps, Step } from '../interface/morador.interface';
-import { BarProgress } from '../shared/components/barProgress';
+import { BarProgress } from '../shared/components/BarProgress';
 
 
 

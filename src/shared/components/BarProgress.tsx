@@ -1,15 +1,11 @@
-// Define (o importa) el tipo 'Step' que usas
 type Step = 'BUSCAR_DNI' | 'REGISTRAR_DATOS' | 'EXITO';
 
 interface BarProgressProps {
-  step: Step; // Usa el tipo específico 'Step'
+  step: Step;
 }
 
-// 1. Acepta un objeto de props
-// 2. Desestructura 'step' de ese objeto
 export const BarProgress = ({ step }: BarProgressProps) => {
   
-  // 3. Tu lógica de estilo ahora funciona perfectamente
   const progressWidth = step === 'BUSCAR_DNI' ? '33%' 
                       : step === 'REGISTRAR_DATOS' ? '66%' 
                       : '100%';
