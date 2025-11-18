@@ -7,7 +7,7 @@ import type { Step, Props } from '../interface/registro.interface';
 
 
 
-export function RegistrarNoAutorizadoPage({ onVolver }: Props) {
+export const RegistrarNoAutorizadoPage = ({ onVolver }: Props) => {
   const { token } = useAuth();
   const [step, setStep] = useState<Step>('BUSCAR_DNI');
 

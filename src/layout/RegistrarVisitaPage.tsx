@@ -6,7 +6,7 @@ import { BarProgress } from '../shared/components/BarProgress';
 import { API_ROUTES } from '../apiConfig';
 
 
-export function RegistrarVisitaPage({ onVolver }: Props) {
+export const RegistrarVisitaPage = ({ onVolver }: Props) => {
   const { token } = useAuth();
   const [step, setStep] = useState<Step>('BUSCAR_DNI');
 

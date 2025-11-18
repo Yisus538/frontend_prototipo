@@ -9,7 +9,7 @@ import { API_ROUTES } from '../apiConfig';
 
 
 
-export function RegistrarMoradorPage({ onVolver }: Props) {
+export const RegistrarMoradorPage = ({ onVolver }: Props) => {
   const { token } = useAuth();
   const [step, setStep] = useState<Step>('BUSCAR_DNI');
 

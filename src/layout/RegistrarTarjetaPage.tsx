@@ -20,7 +20,7 @@ const ProgressBar = ({ step }: { step: number }) => {
     </div>
   );
 };
-export function RegistrarTarjetaPage({ onVolver }: Props) {
+export const RegistrarTarjetaPage = ({ onVolver }: Props) => {
   const { token } = useAuth();
   const [step, setStep] = useState(1);
   const [patente, setPatente] = useState('');
