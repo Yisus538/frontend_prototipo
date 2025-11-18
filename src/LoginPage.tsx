@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { User, Lock, Eye, EyeOff } from 'lucide-react';
 import axios from 'axios';
-import Swal from 'sweetalert2'; // <--- Importamos SweetAlert
+import Swal from 'sweetalert2';
 import { type Usuario } from './App';
+import { useAuth } from './context/AuthContext'; // <-- 1. Importamos el Hook de Contexto
 
 // --- Componentes Visuales (Logo e Input) se mantienen igual ---
 const Logo = () => (
@@ -40,11 +41,14 @@ const InputConIcono = ({ icon, ...props }: InputProps) => (
   </div>
 );
 
-interface LoginPageProps {
-  onLoginSuccess: (usuario: Usuario) => void;
-}
+// --- 2. Quitamos las Props (ya no las necesitamos) ---
+// interface LoginPageProps {
+//   onLoginSuccess: (usuario: Usuario) => void;
+// }
+// export function LoginPage({ onLoginSuccess }: LoginPageProps) {
 
-export function LoginPage({ onLoginSuccess }: LoginPageProps) {
+export function LoginPage() {
+  const { login } = useAuth(); // <-- 3. Obtenemos la función 'login' del contexto
   const [cuenta, setCuenta] = useState('');
   const [contrasena, setContrasena] = useState('');
   const [mostrarContrasena, setMostrarContrasena] = useState(false);
@@ -66,13 +70,15 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
         text: `Bienvenido, ${response.data.usuario.nombre}`,
         icon: 'success',
         confirmButtonText: 'Ingresar',
-        confirmButtonColor: '#4B593C', // Verde militar
+        confirmButtonColor: '#4B593C',
         background: '#fafff9',
-        timer: 2000, // Se cierra solo a los 2 segundos
+        timer: 2000,
         timerProgressBar: true
       }).then(() => {
-        // Cuando se cierra la alerta, cambiamos de pantalla
-        onLoginSuccess(response.data.usuario);
+        // --- 4. Llamamos a 'login' del contexto ---
+        // El backend debe devolver { token, usuario }
+        login(response.data.token, response.data.usuario);
+        // ya no llamamos a onLoginSuccess()
       });
 
     } catch (err: any) {
@@ -89,7 +95,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
         text: mensajeError,
         icon: 'error',
         confirmButtonText: 'Intentar de nuevo',
-        confirmButtonColor: '#d33', // Rojo alerta
+        confirmButtonColor: '#d33',
       });
 
     } finally {
@@ -98,14 +104,13 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
   };
 
   return (
+    // --- Todo tu JSX se mantiene 100% igual ---
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#4B593C] p-4 font-sans">
       <Logo />
       <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-2xl">
         <h2 className="mb-6 text-center text-3xl font-bold text-gray-800">
           Ingresar Cuenta
         </h2>
-
-        {/* Ya no necesitamos el div rojo de error aquí porque sale el popup */}
 
         <form onSubmit={handleSubmit}>
           <div className="mb-5 space-y-6">

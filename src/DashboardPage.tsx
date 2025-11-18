@@ -55,6 +55,8 @@ export function DashboardPage({ onLogout, usuario, onNavegar }: DashboardPagePro
       onNavegar('registrar_visita');
     } else if (opcion === "Registrar no Autorizado") {
       onNavegar('registrar_no_autorizado');
+    } else if (opcion === "Registrar Morador") {
+      onNavegar('registrar_morador');
     }
     else {
       console.log("Opción seleccionada:", opcion);

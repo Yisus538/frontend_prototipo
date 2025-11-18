@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Header } from './Header';
+import { useAuth } from './context/AuthContext'; // <-- 1. Importar el Hook
 
 interface Props {
   onVolver: () => void;
@@ -9,6 +10,7 @@ interface Props {
 type Step = 'BUSCAR_DNI' | 'REGISTRAR_DATOS' | 'EXITO';
 
 export function RegistrarVisitaPage({ onVolver }: Props) {
+  const { token } = useAuth(); // <-- 2. Obtener el token del contexto
   const [step, setStep] = useState<Step>('BUSCAR_DNI');
   
   const [dni, setDni] = useState('');
@@ -24,16 +26,24 @@ export function RegistrarVisitaPage({ onVolver }: Props) {
     setError(null);
 
     try {
-      // Reutilizamos la API que ya existe
-      const response = await fetch(`http://localhost:4000/api/no-autorizados/${dni}`);
+      // --- 3. AÑADIR TOKEN AL HEADER ---
+      const response = await fetch(`http://localhost:4000/api/no-autorizados/${dni}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // <-- Token
+        }
+      });
 
       if (response.ok) {
         // response.ok (200) SIGNIFICA QUE SÍ LO ENCONTRÓ
         setError('Esta persona se encuentra en la lista de no autorizados. No se puede registrar la visita.');
       } else if (response.status === 404) {
         // 404 SIGNIFICA QUE NO LO ENCONTRÓ (¡LUZ VERDE!)
-        // Como en tu captura, mostramos el formulario de registro
         setStep('REGISTRAR_DATOS');
+      } else if (response.status === 401 || response.status === 403) {
+        setError('Sesión expirada. Por favor, vuelve a iniciar sesión.');
+        // Opcional: podrías llamar a logout() aquí
       } else {
         throw new Error('Error del servidor');
       }
@@ -54,20 +64,26 @@ export function RegistrarVisitaPage({ onVolver }: Props) {
     setError(null);
 
     try {
-      // Usamos la NUEVA API que creamos
+      // --- 3. AÑADIR TOKEN AL HEADER (en POST) ---
       const response = await fetch(`http://localhost:4000/api/visitas`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // <-- Token
+        },
         body: JSON.stringify({ dni, nombre }),
       });
 
       if (!response.ok) {
-        throw new Error('Error al guardar la visita');
+        // Manejar errores de token aquí también si es necesario
+        if (response.status === 401 || response.status === 403) {
+          setError('Sesión expirada. Por favor, vuelve a iniciar sesión.');
+        } else {
+          throw new Error('Error al guardar la visita');
+        }
+      } else {
+         setStep('EXITO');
       }
-      
-      // Éxito, mostrar pantalla final
-      setStep('EXITO');
-
     } catch (err) {
       setError('No se pudo guardar la visita. Intente de nuevo.');
     } finally {

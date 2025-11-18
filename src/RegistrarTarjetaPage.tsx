@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { ArrowLeft, CheckCircle, User } from 'lucide-react';
 import { Header } from './Header';
+import { useAuth } from './context/AuthContext'; // <-- 1. Importar el Hook
+import axios from 'axios'; // <-- 2. Importar axios
+import Swal from 'sweetalert2'; // <-- 2. Importar SweetAlert
 
 // Interfaz para los datos del morador (simulada)
 interface MoradorData {
@@ -31,6 +34,7 @@ const ProgressBar = ({ step }: { step: number }) => {
 
 // --- Componente Principal de la Página ---
 export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
+  const { token } = useAuth(); // <-- 3. Obtener el token del contexto
   const [step, setStep] = useState(1);
   const [patente, setPatente] = useState('');
   const [idMorador, setIdMorador] = useState('');
@@ -52,57 +56,59 @@ export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
     if (!idMorador) return;
     setCargando(true);
 
-    // --- SIMULACIÓN DE BÚSQUEDA DE API ---
-    // En el futuro, reemplazarías esto con:
-    // try {
-    //   const response = await axios.get(`http://localhost:4000/api/moradores/${idMorador}`);
-    //   setDatosMorador(response.data);
-    //   setStep(3);
-    // } catch (err) {
-    //   Swal.fire('Error', 'No se encontró el morador con ese ID.', 'error');
-    // } finally {
-    //   setCargando(false);
-    // }
+    // --- BÚSQUEDA DE API REAL CON TOKEN ---
+    try {
+      // 4. Añadir token al header
+      const response = await axios.get(`http://localhost:4000/api/moradores/${idMorador}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
-    // --- Datos de simulación (basados en tu captura) ---
-    setTimeout(() => {
-      const mockData: MoradorData = {
-        id: idMorador,
-        nombre: 'José Luis Santi',
-        dni: '45120365',
-        direccion: 'Sector Oficiales - Casa 124',
-        numeroTarjeta: 'TAR201', // El backend podría sugerir esto
-      };
-      setDatosMorador(mockData);
+      setDatosMorador(response.data);
       setStep(3);
+
+    } catch (err: any) {
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        Swal.fire('Error', 'Sesión expirada. Por favor, inicie sesión de nuevo.', 'error');
+        // Opcional: podrías llamar a logout() aquí si lo traes del contexto
+      } else if (err.response?.status === 404) {
+        Swal.fire('Error', 'No se encontró el morador con ese ID.', 'error');
+      } else {
+        Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
+      }
+    } finally {
       setCargando(false);
-    }, 1000);
+    }
   };
 
   // Paso 3 a 4: Genera la tarjeta
   const handlePaso3Submit = async () => {
     setCargando(true);
 
-    // --- SIMULACIÓN DE GUARDADO EN API ---
-    // Aquí harías el POST final a tu backend
-    // try {
-    //   await axios.post('http://localhost:4000/api/tarjetas', {
-    //     idMorador: datosMorador?.id,
-    //     patente: patente,
-    //     numeroTarjeta: datosMorador?.numeroTarjeta
-    //   });
-    //   setStep(4);
-    // } catch (err) {
-    //   Swal.fire('Error', 'No se pudo generar la tarjeta.', 'error');
-    // } finally {
-    //   setCargando(false);
-    // }
-
-    // Simulación
-    setTimeout(() => {
+    // --- GUARDADO EN API REAL CON TOKEN ---
+    try {
+      // 4. Añadir token al header
+      await axios.post('http://localhost:4000/api/tarjetas', {
+        idMorador: datosMorador?.id,
+        patente: patente,
+        numeroTarjeta: datosMorador?.numeroTarjeta
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       setStep(4);
+
+    } catch (err: any) {
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        Swal.fire('Error', 'Sesión expirada. Por favor, inicie sesión de nuevo.', 'error');
+      } else {
+        Swal.fire('Error', 'No se pudo generar la tarjeta.', 'error');
+      }
+    } finally {
       setCargando(false);
-    }, 1000);
+    }
   };
 
   // Salir: Resetea todo y vuelve al dashboard
@@ -114,7 +120,7 @@ export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
     onVolver(); // Llama a la función de App.tsx
   };
 
-  // --- RENDERIZADO ---
+  // --- RENDERIZADO (Se mantiene 100% igual) ---
   return (
     <div className="flex min-h-screen flex-col bg-[#F5F5F5] font-sans">
       {/* Header (copiado de tu diseño) */}

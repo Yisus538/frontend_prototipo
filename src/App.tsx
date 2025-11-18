@@ -1,21 +1,21 @@
 import { useState } from 'react';
-import { LoginPage } from './LoginPage'; // Asumo que tienes este componente
+import { LoginPage } from './LoginPage';
 import { DashboardPage } from './DashboardPage';
 import { RegistrarTarjetaPage } from './RegistrarTarjetaPage';
-import { ConsultarNoAutorizadoPage } from './ConsultarNoAutorizadosPage'; // <-- 1. Importamos la nueva pantalla
+import { ConsultarNoAutorizadoPage } from './ConsultarNoAutorizadosPage';
 import { RegistrarVisitaPage } from './RegistrarVisitaPage';
 import { RegistrarNoAutorizadoPage } from './RegistrarNoAutorizadoPage';
+import { useAuth } from './context/AuthContext'; // <-- 1. Importar el Hook
+import { RegistrarMoradorPage } from './RegistrarMoradorPage';
 
 // --- INTERFACES GLOBALES ---
-
-// Interfaz de Usuario para login
+// (Estas interfaces deberían moverse a un archivo propio, ej: 'types.ts')
 export interface Usuario {
   nombre: string;
   cuenta: string;
   rol: 'admin' | 'centinela';
 }
 
-// Interfaz para la nueva pantalla (basado en tu JSON)
 export interface NoAutorizado {
   id: string;
   dni: string;
@@ -25,50 +25,49 @@ export interface NoAutorizado {
 }
 
 // --- TIPOS GLOBALES ---
-
-// Definimos los tipos de vistas que la app puede mostrar
-// <-- 2. Añadimos la nueva vista
-export type Vista = 'dashboard' | 'registrar_tarjeta' | 'consultar_no_autorizado' | 'registrar_visita' | 'registrar_no_autorizado';
+export type Vista = 'dashboard' | 'registrar_tarjeta' | 'consultar_no_autorizado' | 'registrar_visita' | 'registrar_no_autorizado' | 'registrar_morador';
 
 
 function App() {
-  const [usuario, setUsuario] = useState<Usuario | null>(null);
+  // --- 2. ELIMINAMOS EL ESTADO DEL USUARIO ---
+  // const [usuario, setUsuario] = useState<Usuario | null>(null);
+
+  // --- 3. OBTENEMOS TODO DEL CONTEXTO ---
+  const { isAuthenticated, user, logout } = useAuth();
+
   const [vistaActual, setVistaActual] = useState<Vista>('dashboard');
 
-  const handleLoginSuccess = (datosUsuario: Usuario) => {
-    setUsuario(datosUsuario);
-    setVistaActual('dashboard');
-  };
+  // handleLoginSuccess ya no es necesario aquí, LoginPage lo hará con el contexto
 
+  // handleLogout ahora usa el contexto
   const handleLogout = () => {
-    setUsuario(null);
+    logout();
+    // No necesitamos setUsuario(null), el contexto lo hace
   };
 
-  // Función que pasamos al Dashboard para cambiar de vista
   const handleNavegar = (vista: Vista) => {
     setVistaActual(vista);
   };
 
-  // Función para que las sub-páginas puedan volver al dashboard
   const handleVolverDashboard = () => {
     setVistaActual('dashboard');
   };
 
 
-  // --- Lógica de Renderizado ---
+  // --- 4. LÓGICA DE RENDERIZADO MODIFICADA ---
 
-  // Si NO hay usuario, siempre mostramos el Login
-  if (!usuario) {
-    // Asegúrate de tener el componente LoginPage en tu proyecto
-    return <LoginPage onLoginSuccess={handleLoginSuccess} />;
+  // Si NO estamos autenticados, siempre mostramos el Login
+  if (!isAuthenticated) {
+    // onLoginSuccess ya no es necesario, LoginPage usa el contexto
+    return <LoginPage />;
   }
 
-  // Si HAY usuario, decidimos qué vista mostrar
+  // Si ESTAMOS autenticados (user existe), decidimos qué vista mostrar
   switch (vistaActual) {
     case 'dashboard':
       return (
         <DashboardPage
-          usuario={usuario}
+          usuario={user!} // user! (con !) le dice a TS que user no es null aquí
           onLogout={handleLogout}
           onNavegar={handleNavegar}
         />
@@ -79,8 +78,6 @@ function App() {
           onVolver={handleVolverDashboard}
         />
       );
-
-    // <-- 3. AÑADIMOS EL CASO PARA LA NUEVA PANTALLA
     case 'consultar_no_autorizado':
       return (
         <ConsultarNoAutorizadoPage
@@ -99,10 +96,14 @@ function App() {
           onVolver={handleVolverDashboard}
         />
       );
-
+    case 'registrar_morador':
+      return (
+        <RegistrarMoradorPage
+          onVolver={handleVolverDashboard}
+        />
+      );
 
     default:
-      // Caso por defecto, volvemos al dashboard
       setVistaActual('dashboard');
       return null;
   }
