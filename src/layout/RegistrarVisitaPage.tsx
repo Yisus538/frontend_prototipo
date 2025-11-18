@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Header } from '../shared/components/Header';
 import { useAuth } from '../context/AuthContext';
-import type { Props, Step } from '../interface/noAutorizado.interface';
+import type { Props, Step } from '../interface/registro.interface';
 import { BarProgress } from '../shared/components/BarProgress';
 import { API_ROUTES } from '../apiConfig';
 

@@ -3,13 +3,13 @@ import { Header } from '../shared/components/Header';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
-import type { RegistrarTarjetaPageProps, Step } from '../interface/morador.interface';
+import type { Props, Step } from '../interface/registro.interface';
 import { BarProgress } from '../shared/components/BarProgress';
 import { API_ROUTES } from '../apiConfig';
 
 
 
-export function RegistrarMoradorPage({ onVolver }: RegistrarTarjetaPageProps) {
+export function RegistrarMoradorPage({ onVolver }: Props) {
   const { token } = useAuth();
   const [step, setStep] = useState<Step>('BUSCAR_DNI');
 

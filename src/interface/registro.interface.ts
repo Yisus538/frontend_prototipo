@@ -6,7 +6,7 @@ export interface MoradorData {
     numeroTarjeta: string;
 }
 
-export interface RegistrarTarjetaPageProps {
+export interface Props {
     onVolver: () => void;
 }
 

@@ -4,7 +4,7 @@ import { Header } from '../shared/components/Header';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import type { MoradorData, RegistrarTarjetaPageProps } from '../interface/morador.interface';
+import type { MoradorData, Props } from '../interface/registro.interface';
 import { API_ROUTES } from '../apiConfig';
 
 
@@ -20,7 +20,7 @@ const ProgressBar = ({ step }: { step: number }) => {
     </div>
   );
 };
-export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
+export function RegistrarTarjetaPage({ onVolver }: Props) {
   const { token } = useAuth();
   const [step, setStep] = useState(1);
   const [patente, setPatente] = useState('');
