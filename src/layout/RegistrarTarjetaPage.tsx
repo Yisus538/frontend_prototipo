@@ -10,6 +10,17 @@ import { BarProgress } from '../shared/components/BarProgress';
 
 
 
+const ProgressBar = ({ step }: { step: number }) => {
+  const progressWidth = `${(step / 4) * 100}%`;
+  return (
+    <div className="w-full bg-gray-200 rounded-full h-2.5 mb-8">
+      <div
+        className="bg-green-600 h-2.5 rounded-full transition-all duration-300"
+        style={{ width: progressWidth }}
+      ></div>
+    </div>
+  );
+};
 export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
   const { token } = useAuth();
   const [step, setStep] = useState(1);
@@ -104,8 +115,8 @@ export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
             <h1 className="text-3xl font-bold text-gray-700">Registrar tarjeta</h1>
           </div>
 
-          <BarProgress progress={step} />
-
+          <ProgressBar step={step} />
+          
           {step === 1 && (
             <div className="rounded-xl bg-white p-8 shadow-lg animate-fade-in">
               <form onSubmit={handlePaso1Submit}>
