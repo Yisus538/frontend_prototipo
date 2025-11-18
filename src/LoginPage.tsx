@@ -53,10 +53,7 @@ export function LoginPage() {
         timer: 2000,
         timerProgressBar: true
       }).then(() => {
-        // --- 4. Llamamos a 'login' del contexto ---
-        // El backend debe devolver { token, usuario }
         login(response.data.token, response.data.usuario);
-        // ya no llamamos a onLoginSuccess()
       });
 
     } catch (err: any) {
