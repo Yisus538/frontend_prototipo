@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Header } from './shared/components/Header';
-import { type NoAutorizado, type Props } from './interface/app.interface';
-
+import { type NoAutorizado, type Props } from './interface/app.interface'; 
+import { useAuth } from './context/AuthContext'; 
 
 export function ConsultarNoAutorizadoPage({ onVolver }: Props) {
+  const { token } = useAuth(); 
   const [dniBusqueda, setDniBusqueda] = useState('');
   const [haBuscado, setHaBuscado] = useState(false);
   const [resultado, setResultado] = useState<NoAutorizado | null>(null);
@@ -16,15 +17,23 @@ export function ConsultarNoAutorizadoPage({ onVolver }: Props) {
     setErrorApi(null);
 
     try {
-      const response = await fetch(`http://localhost:4000/api/auth/no-autorizados/${dniBusqueda}`);
+    
+      const response = await fetch(`http://localhost:4000/api/no-autorizados/${dniBusqueda}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+        }
+      });
 
       if (response.ok) {
-
         const data: NoAutorizado = await response.json();
         setResultado(data);
       } else if (response.status === 404) {
-
         setResultado(null);
+      } else if (response.status === 401 || response.status === 403) {
+         // <-- 4. Manejar error si el token es inválido
+        setErrorApi("Sesión expirada. Por favor, inicie sesión de nuevo.");
       } else {
         throw new Error('Error del servidor al buscar');
       }
@@ -47,6 +56,7 @@ export function ConsultarNoAutorizadoPage({ onVolver }: Props) {
   };
 
   return (
+    // --- TU CÓDIGO JSX (SIN CAMBIOS) ---
     <div className="min-h-screen bg-white font-sans text-gray-800">
       <Header />
 
@@ -67,7 +77,7 @@ export function ConsultarNoAutorizadoPage({ onVolver }: Props) {
         </div>
 
 
-        <div className="mb-12 h-1.5 w-full rounded-full bg-gray-200">
+        <div className="mb-12 h-1.Gira (Rotación): Usa las flechas izquierda/derecha.5 w-full rounded-full bg-gray-200">
           <div className={`h-1.5 rounded-full bg-[#4B6F44] transition-all duration-500 ${haBuscado ? 'w-full' : 'w-1/2'}`}></div>
         </div>
 
