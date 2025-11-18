@@ -42,7 +42,6 @@ export function LoginPage() {
         contrasena
       });
 
-      // --- LOGIN EXITOSO (SweetAlert) ---
       Swal.fire({
         title: '¡Acceso Autorizado!',
         text: `Bienvenido, ${response.data.usuario.nombre}`,

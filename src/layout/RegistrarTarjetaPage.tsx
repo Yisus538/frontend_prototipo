@@ -6,6 +6,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import type { MoradorData, RegistrarTarjetaPageProps } from '../interface/morador.interface';
 import { API_ROUTES } from '../apiConfig';
+import { BarProgress } from '../shared/components/BarProgress';
 
 
 
@@ -39,9 +40,8 @@ export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
     if (!idMorador) return;
     setCargando(true);
 
-    // --- BÚSQUEDA DE API REAL CON TOKEN ---
+
     try {
-      // 4. Añadir token al header
       const response = await axios.get(`${API_ROUTES.moradores}/${idMorador}`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -54,7 +54,7 @@ export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
     } catch (err: any) {
       if (err.response?.status === 401 || err.response?.status === 403) {
         Swal.fire('Error', 'Sesión expirada. Por favor, inicie sesión de nuevo.', 'error');
-        // Opcional: podrías llamar a logout() aquí si lo traes del contexto
+
       } else if (err.response?.status === 404) {
         Swal.fire('Error', 'No se encontró el morador con ese ID.', 'error');
       } else {
@@ -115,7 +115,7 @@ export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
             <h1 className="text-3xl font-bold text-gray-700">Registrar tarjeta</h1>
           </div>
 
-          <ProgressBar step={step} />
+          <BarProgress progress={step} />
 
           {step === 1 && (
             <div className="rounded-xl bg-white p-8 shadow-lg animate-fade-in">
