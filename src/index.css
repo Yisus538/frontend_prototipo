@@ -1,0 +1,19 @@
+@import "tailwindcss";
+@tailwind utilities;
+
+/* Añadir esto al final de tu index.css */
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px); /* Empieza un poco a la derecha */
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in-right {
+  animation: fadeInRight 0.5s ease-out forwards;
+}
