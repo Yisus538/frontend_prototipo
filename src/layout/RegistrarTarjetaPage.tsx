@@ -6,7 +6,6 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import type { MoradorData, RegistrarTarjetaPageProps } from '../interface/morador.interface';
 import { API_ROUTES } from '../apiConfig';
-import { BarProgress } from '../shared/components/BarProgress';
 
 
 
@@ -116,7 +115,7 @@ export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
           </div>
 
           <ProgressBar step={step} />
-          
+
           {step === 1 && (
             <div className="rounded-xl bg-white p-8 shadow-lg animate-fade-in">
               <form onSubmit={handlePaso1Submit}>
