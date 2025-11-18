@@ -1,23 +1,16 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { type Usuario } from '../App'; // Reutilizamos la interfaz que ya tienes en App.tsx
+import { type Usuario } from '../interface/app.interface';
+import type { AuthContextType } from '../interface/auth.interface';
 
-// Definimos qué funciones y datos exporta nuestro contexto
-interface AuthContextType {
-    isAuthenticated: boolean;
-    token: string | null;
-    user: Usuario | null;
-    login: (token: string, userData: Usuario) => void;
-    logout: () => void;
-}
+
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [token, setToken] = useState<string | null>(null);
     const [user, setUser] = useState<Usuario | null>(null);
-    const [isLoading, setIsLoading] = useState(true); // Estado para saber si ya cargó localStorage
+    const [isLoading, setIsLoading] = useState(true); 
 
-    // Al iniciar la app, verificamos si ya hay un token guardado
     useEffect(() => {
         try {
             const storedToken = localStorage.getItem('token');
@@ -30,16 +23,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } catch (error) {
             console.error("Error al cargar datos de localStorage", error);
         } finally {
-            setIsLoading(false); // Terminamos de cargar
+            setIsLoading(false); 
         }
     }, []);
 
     const login = (newToken: string, userData: Usuario) => {
-        // 1. Actualizamos el estado
+        
         setToken(newToken);
         setUser(userData);
 
-        // 2. Guardamos en localStorage (persistencia)
+        
         try {
             localStorage.setItem('token', newToken);
             localStorage.setItem('user', JSON.stringify(userData));
@@ -59,13 +52,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    // Calculamos si está autenticado basándonos en si existe el token
+   
     const isAuthenticated = !!token;
 
-    // No renderizamos nada hasta saber si estamos logueados o no
-    if (isLoading) {
-        return null; // O un spinner de carga global
-    }
+    if (isLoading) return null; 
+    
 
     return (
         <AuthContext.Provider value={{ isAuthenticated, token, user, login, logout }}>
@@ -74,7 +65,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
 };
 
-// Hook personalizado para usar el contexto fácilmente
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {

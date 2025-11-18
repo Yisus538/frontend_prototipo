@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { type Usuario, type Vista } from './App';
-import { Header } from './Header';
+import { Header } from './shared/components/Header';
+import type { DashboardPageProps } from './interface/dashborad.interface';
 
 const MenuButton = ({ label, onClick }: { label: string; onClick: () => void; }) => (
   <button
@@ -11,23 +11,14 @@ const MenuButton = ({ label, onClick }: { label: string; onClick: () => void; })
   </button>
 );
 
-interface DashboardPageProps {
-  onLogout: () => void;
-  usuario: Usuario;
-  onNavegar: (vista: Vista) => void;
-}
-
 export function DashboardPage({ onLogout, usuario, onNavegar }: DashboardPageProps) {
   const [paginaActual, setPaginaActual] = useState(1);
 
-  // Opciones de Admin
   const opcionesAdmin: Record<number, string[]> = {
     1: ["Registrar Tarjeta", "Consultar no Autorizado", "Registrar no Autorizado", "Registrar Visita", "Registrar Morador"],
     2: ["Registrar Personal Fijo", "Consultar Visita", "Registrar Patente", "Registrar Personal Temporal", "Registrar Reclamo baja Tarjeta"],
     3: ["Consultar Personal Temporal", "Consultar Personal Fijo"],
   };
-
-  // Opciones de Centinela
   const opcionesCentinela: Record<number, string[]> = {
     1: ["Registrar Ingreso", "Consultar no Autorizado", "Registrar Salida", "Consultar Personal Temporal", "Consultar Personal Fijo"],
   };
@@ -50,7 +41,6 @@ export function DashboardPage({ onLogout, usuario, onNavegar }: DashboardPagePro
     else if (opcion === "Consultar no Autorizado") {
       onNavegar('consultar_no_autorizado');
     }
-    // 3. AGREGA ESTA CONDICIÓN
     else if (opcion === "Registrar Visita") {
       onNavegar('registrar_visita');
     } else if (opcion === "Registrar no Autorizado") {

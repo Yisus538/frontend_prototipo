@@ -1,10 +1,7 @@
 import { useState } from 'react';
-import { Header } from './Header';
-import { type NoAutorizado } from './App'; // Importamos la interfaz
+import { Header } from './shared/components/Header';
+import { type NoAutorizado, type Props } from './interface/app.interface';
 
-interface Props {
-  onVolver: () => void;
-}
 
 export function ConsultarNoAutorizadoPage({ onVolver }: Props) {
   const [dniBusqueda, setDniBusqueda] = useState('');
@@ -16,22 +13,19 @@ export function ConsultarNoAutorizadoPage({ onVolver }: Props) {
   const handleBuscar = async () => {
     if (!dniBusqueda) return;
     setLoading(true);
-    setErrorApi(null); // Limpiamos errores previos
+    setErrorApi(null);
 
     try {
-      // --- Conexión real al Backend ---
-      // Asumimos que tu backend corre en el puerto 3001
-      const response = await fetch(`http://localhost:4000/api/no-autorizados/${dniBusqueda}`);
+      const response = await fetch(`http://localhost:4000/api/auth/no-autorizados/${dniBusqueda}`);
 
       if (response.ok) {
-        // Encontrado en la lista negra
+
         const data: NoAutorizado = await response.json();
         setResultado(data);
       } else if (response.status === 404) {
-        // No encontrado en la lista negra (persona "limpia")
+
         setResultado(null);
       } else {
-        // Otro error del servidor
         throw new Error('Error del servidor al buscar');
       }
 
@@ -72,21 +66,18 @@ export function ConsultarNoAutorizadoPage({ onVolver }: Props) {
           <h1 className="text-2xl font-medium text-[#6B9080]">Consultar no Autorizados</h1>
         </div>
 
-        {/* Barra de Progreso Visual */}
+
         <div className="mb-12 h-1.5 w-full rounded-full bg-gray-200">
           <div className={`h-1.5 rounded-full bg-[#4B6F44] transition-all duration-500 ${haBuscado ? 'w-full' : 'w-1/2'}`}></div>
         </div>
 
-        {/* Mensaje de Error de API */}
+
         {errorApi && (
           <div className="mb-4 rounded-md border border-red-300 bg-red-100 p-4 text-center text-red-800">
             {errorApi}
           </div>
         )}
-
-        {/* CONTENIDO DINÁMICO */}
         {!haBuscado ? (
-          /* --- VISTA 1: INPUT DE BÚSQUEDA --- */
           <div className="flex flex-col items-center justify-center py-10 animate-fade-in">
             <div className="w-full max-w-md">
               <label htmlFor="dni_input" className="mb-2 block text-sm font-bold text-[#2F3E20]">Ingresar</label>
@@ -112,22 +103,19 @@ export function ConsultarNoAutorizadoPage({ onVolver }: Props) {
             </div>
           </div>
         ) : (
-          /* --- VISTA 2: RESULTADOS --- */
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 pt-4 animate-fade-in">
 
-            {/* Columna Izquierda: Datos */}
             <div className="space-y-6">
               <div>
                 <h3 className="text-sm font-bold uppercase text-[#2F3E20]">Persona</h3>
                 {resultado ? (
-                  // Si encontramos a alguien en la lista negra
+
                   <div className="mt-4 space-y-2 text-lg">
                     <p><span className="font-semibold">DNI:</span> {resultado.dni}</p>
                     <p><span className="font-semibold">Nombre:</span> {resultado.nombre}</p>
                     <p className="text-red-600"><span className="font-semibold text-black">Motivo:</span> {resultado.motivo}</p>
                   </div>
                 ) : (
-                  // Si NO está en la lista negra (usamos datos input)
                   <div className="mt-4 space-y-2 text-lg">
                     <p><span className="font-semibold">DNI:</span> {dniBusqueda}</p>
                     <p className="text-gray-500 italic">Sin datos registrados</p>
@@ -140,14 +128,12 @@ export function ConsultarNoAutorizadoPage({ onVolver }: Props) {
             <div className="flex flex-col items-center justify-center space-y-8">
 
               {resultado ? (
-                // CASO: ESTÁ EN LISTA NEGRA (ROJO)
                 <div className="flex w-full max-w-sm items-center justify-center rounded-xl bg-red-200 p-8 text-center shadow-sm">
                   <p className="text-xl font-medium text-red-900">
                     ¡ALERTA! <br /> La persona SE ENCUENTRA en la lista de no autorizados.
                   </p>
                 </div>
               ) : (
-                // CASO: NO ESTÁ EN LISTA NEGRA (VERDE - como tu foto)
                 <div className="flex w-full max-w-sm items-center justify-center rounded-xl bg-[#DFFFD6] p-8 text-center shadow-sm">
                   <p className="text-xl font-medium text-green-900">
                     La persona no se encuentra en la lista de no autorizados
@@ -156,7 +142,7 @@ export function ConsultarNoAutorizadoPage({ onVolver }: Props) {
               )}
 
               <button
-                onClick={handleReiniciar} // O onVolver si prefieres salir directo
+                onClick={handleReiniciar}
                 className="w-full max-w-xs rounded-md bg-[#8F9E78] py-2 text-white font-medium shadow-md hover:bg-[#7A8C60]"
               >
                 Salir

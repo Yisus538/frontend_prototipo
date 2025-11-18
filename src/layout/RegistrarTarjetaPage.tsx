@@ -1,25 +1,13 @@
 import React, { useState } from 'react';
 import { ArrowLeft, CheckCircle, User } from 'lucide-react';
-import { Header } from './Header';
-import { useAuth } from './context/AuthContext'; // <-- 1. Importar el Hook
-import axios from 'axios'; // <-- 2. Importar axios
-import Swal from 'sweetalert2'; // <-- 2. Importar SweetAlert
+import { Header } from '../shared/components/Header';
+import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
+import Swal from 'sweetalert2';
+import type { MoradorData, RegistrarTarjetaPageProps } from '../interface/morador.interface';
 
-// Interfaz para los datos del morador (simulada)
-interface MoradorData {
-  id: string;
-  nombre: string;
-  dni: string;
-  direccion: string;
-  numeroTarjeta: string; // El número de tarjeta que se le asignará
-}
 
-// Props que recibe de App.tsx
-interface RegistrarTarjetaPageProps {
-  onVolver: () => void;
-}
 
-// Componente de la Barra de Progreso
 const ProgressBar = ({ step }: { step: number }) => {
   const progressWidth = `${(step / 4) * 100}%`;
   return (
@@ -31,26 +19,20 @@ const ProgressBar = ({ step }: { step: number }) => {
     </div>
   );
 };
-
-// --- Componente Principal de la Página ---
 export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
-  const { token } = useAuth(); // <-- 3. Obtener el token del contexto
+  const { token } = useAuth();
   const [step, setStep] = useState(1);
   const [patente, setPatente] = useState('');
   const [idMorador, setIdMorador] = useState('');
   const [datosMorador, setDatosMorador] = useState<MoradorData | null>(null);
   const [cargando, setCargando] = useState(false);
 
-  // --- LÓGICA DE NAVEGACIÓN ENTRE PASOS ---
 
-  // Paso 1 a 2: Solo guarda la patente y avanza
   const handlePaso1Submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!patente) return;
     setStep(2);
   };
-
-  // Paso 2 a 3: Busca los datos del morador
   const handlePaso2Submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!idMorador) return;
@@ -81,14 +63,11 @@ export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
       setCargando(false);
     }
   };
-
-  // Paso 3 a 4: Genera la tarjeta
   const handlePaso3Submit = async () => {
     setCargando(true);
 
-    // --- GUARDADO EN API REAL CON TOKEN ---
+
     try {
-      // 4. Añadir token al header
       await axios.post('http://localhost:4000/api/tarjetas', {
         idMorador: datosMorador?.id,
         patente: patente,
@@ -111,26 +90,20 @@ export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
     }
   };
 
-  // Salir: Resetea todo y vuelve al dashboard
   const handleSalir = () => {
     setStep(1);
     setPatente('');
     setIdMorador('');
     setDatosMorador(null);
-    onVolver(); // Llama a la función de App.tsx
+    onVolver();
   };
-
-  // --- RENDERIZADO (Se mantiene 100% igual) ---
   return (
     <div className="flex min-h-screen flex-col bg-[#F5F5F5] font-sans">
-      {/* Header (copiado de tu diseño) */}
       <Header />
 
-      {/* Contenido Principal */}
       <main className="flex-1 p-10">
         <div className="mx-auto max-w-2xl">
 
-          {/* Título y Botón Volver */}
           <div className="flex items-center space-x-4 mb-4">
             <button
               onClick={step > 1 ? () => setStep(step - 1) : onVolver}
@@ -143,7 +116,6 @@ export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
 
           <ProgressBar step={step} />
 
-          {/* --- PASO 1: INGRESAR PATENTE --- */}
           {step === 1 && (
             <div className="rounded-xl bg-white p-8 shadow-lg animate-fade-in">
               <form onSubmit={handlePaso1Submit}>
@@ -167,7 +139,6 @@ export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
             </div>
           )}
 
-          {/* --- PASO 2: INGRESAR ID MORADOR --- */}
           {step === 2 && (
             <div className="rounded-xl bg-white p-8 shadow-lg animate-fade-in">
               <form onSubmit={handlePaso2Submit}>
@@ -191,7 +162,6 @@ export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
             </div>
           )}
 
-          {/* --- PASO 3: CONFIRMAR DATOS --- */}
           {step === 3 && datosMorador && (
             <div className="rounded-xl bg-white p-8 shadow-lg animate-fade-in">
               <h2 className="mb-6 text-xl font-semibold text-gray-800 border-b pb-3">Datos tarjeta</h2>
@@ -220,7 +190,6 @@ export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
             </div>
           )}
 
-          {/* --- PASO 4: TARJETA GENERADA (ÉXITO) --- */}
           {step === 4 && datosMorador && (
             <div className="rounded-xl bg-white p-8 shadow-lg animate-fade-in text-center">
               <CheckCircle size={64} className="mx-auto text-green-500 mb-4" />
@@ -228,9 +197,7 @@ export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
                 Tarjeta generada correctamente
               </h2>
 
-              {/* Visual de la Tarjeta (simplificado) */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 select-none">
-                {/* Frente */}
                 <div className="bg-[#4B593C] text-white p-6 rounded-xl shadow-lg">
                   <span className="block text-right font-mono text-lg">{datosMorador.numeroTarjeta}</span>
                   <div className="mt-16">
@@ -238,7 +205,6 @@ export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
                     <span className="block font-mono text-2xl">{patente}</span>
                   </div>
                 </div>
-                {/* Dorso */}
                 <div className="bg-gray-100 border border-gray-300 p-6 rounded-xl shadow-lg flex items-center space-x-4">
                   <User size={64} className="text-gray-400" />
                   <div>

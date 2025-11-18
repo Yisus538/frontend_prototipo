@@ -1,49 +1,42 @@
 import { useState } from 'react';
-import { Header } from './Header';
-import { useAuth } from './context/AuthContext'; // <-- 1. Importar el Hook
+import { Header } from '../shared/components/Header';
+import { useAuth } from '../context/AuthContext';
+import type { Props, Step } from '../interface/noAutorizado.interface';
+import { BarProgress } from '../shared/components/barProgress';
 
-interface Props {
-  onVolver: () => void;
-}
-
-// Los 3 pasos del formulario
-type Step = 'BUSCAR_DNI' | 'REGISTRAR_DATOS' | 'EXITO';
 
 export function RegistrarVisitaPage({ onVolver }: Props) {
-  const { token } = useAuth(); // <-- 2. Obtener el token del contexto
+  const { token } = useAuth();
   const [step, setStep] = useState<Step>('BUSCAR_DNI');
-  
+
   const [dni, setDni] = useState('');
   const [nombre, setNombre] = useState('');
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Paso 1: Buscar DNI en lista de "No Autorizados"
+
   const handleBuscarDni = async () => {
     if (!dni) return;
     setLoading(true);
     setError(null);
 
     try {
-      // --- 3. AÑADIR TOKEN AL HEADER ---
       const response = await fetch(`http://localhost:4000/api/no-autorizados/${dni}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // <-- Token
+          'Authorization': `Bearer ${token}`
         }
       });
 
       if (response.ok) {
-        // response.ok (200) SIGNIFICA QUE SÍ LO ENCONTRÓ
+
         setError('Esta persona se encuentra en la lista de no autorizados. No se puede registrar la visita.');
       } else if (response.status === 404) {
-        // 404 SIGNIFICA QUE NO LO ENCONTRÓ (¡LUZ VERDE!)
         setStep('REGISTRAR_DATOS');
       } else if (response.status === 401 || response.status === 403) {
         setError('Sesión expirada. Por favor, vuelve a iniciar sesión.');
-        // Opcional: podrías llamar a logout() aquí
       } else {
         throw new Error('Error del servidor');
       }
@@ -54,7 +47,6 @@ export function RegistrarVisitaPage({ onVolver }: Props) {
     }
   };
 
-  // Paso 2: Guardar la visita en la nueva API
   const handleGuardarVisita = async () => {
     if (!nombre) {
       setError('El nombre y apellido son requeridos.');
@@ -64,25 +56,23 @@ export function RegistrarVisitaPage({ onVolver }: Props) {
     setError(null);
 
     try {
-      // --- 3. AÑADIR TOKEN AL HEADER (en POST) ---
       const response = await fetch(`http://localhost:4000/api/visitas`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // <-- Token
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ dni, nombre }),
       });
 
       if (!response.ok) {
-        // Manejar errores de token aquí también si es necesario
         if (response.status === 401 || response.status === 403) {
           setError('Sesión expirada. Por favor, vuelve a iniciar sesión.');
         } else {
           throw new Error('Error al guardar la visita');
         }
       } else {
-         setStep('EXITO');
+        setStep('EXITO');
       }
     } catch (err) {
       setError('No se pudo guardar la visita. Intente de nuevo.');
@@ -90,8 +80,7 @@ export function RegistrarVisitaPage({ onVolver }: Props) {
       setLoading(false);
     }
   };
-  
-  // Vuelve al estado inicial
+
   const handleReiniciar = () => {
     setDni('');
     setNombre('');
@@ -99,18 +88,17 @@ export function RegistrarVisitaPage({ onVolver }: Props) {
     setStep('BUSCAR_DNI');
   };
 
-  // Renderiza el contenido según el paso
+
   const renderStep = () => {
     switch (step) {
-      // --- PASO 1: BUSCAR DNI ---
       case 'BUSCAR_DNI':
         return (
           <div className="flex flex-col items-center justify-center py-10">
             <div className="w-full max-w-md">
               <label htmlFor="dni_input" className="mb-2 block text-sm font-bold text-[#2F3E20]">Ingresar</label>
-              <input 
+              <input
                 id="dni_input"
-                type="text" 
+                type="text"
                 placeholder="DNI"
                 className="w-full border-b-2 border-gray-300 py-2 text-lg outline-none focus:border-[#4B593C]"
                 value={dni}
@@ -118,7 +106,7 @@ export function RegistrarVisitaPage({ onVolver }: Props) {
                 onKeyDown={(e) => e.key === 'Enter' && handleBuscarDni()}
               />
               <div className="mt-12 flex justify-center">
-                <button 
+                <button
                   onClick={handleBuscarDni}
                   disabled={loading}
                   className="rounded-md bg-[#8F9E78] px-12 py-2 text-white font-medium shadow-md transition hover:bg-[#7A8C60] disabled:opacity-50"
@@ -130,7 +118,6 @@ export function RegistrarVisitaPage({ onVolver }: Props) {
           </div>
         );
 
-      // --- PASO 2: REGISTRAR DATOS ---
       case 'REGISTRAR_DATOS':
         return (
           <div className="w-full max-w-lg mx-auto py-6 animate-fade-in">
@@ -143,17 +130,15 @@ export function RegistrarVisitaPage({ onVolver }: Props) {
                 Nueva visita
               </h3>
               <div className="mt-6 space-y-4">
-                {/* DNI (no editable) */}
                 <div>
                   <label className="text-sm font-medium text-gray-500">DNI</label>
                   <p className="text-lg font-semibold text-gray-800">{dni}</p>
                 </div>
-                {/* Nombre (editable) */}
                 <div>
                   <label htmlFor="nombre_input" className="mb-1 block text-sm font-medium text-gray-700">Nombre y Apellido</label>
-                  <input 
+                  <input
                     id="nombre_input"
-                    type="text" 
+                    type="text"
                     placeholder="Ej: Santiago Torres"
                     className="w-full rounded-md border border-gray-300 px-3 py-2 text-lg outline-none focus:border-[#4B593C] focus:ring-1 focus:ring-[#4B593C]"
                     value={nombre}
@@ -162,17 +147,17 @@ export function RegistrarVisitaPage({ onVolver }: Props) {
                 </div>
               </div>
             </div>
-            
+
             <div className="mt-8 flex justify-center gap-4">
-              <button 
+              <button
                 onClick={handleGuardarVisita}
                 disabled={loading}
                 className="rounded-md bg-[#8F9E78] px-10 py-2 text-white font-medium shadow transition hover:bg-[#7A8C60] disabled:opacity-50"
               >
                 {loading ? 'Guardando...' : 'Guardar visita'}
               </button>
-              <button 
-                onClick={handleReiniciar} // O puedes usar onVolver
+              <button
+                onClick={handleReiniciar}
                 disabled={loading}
                 className="rounded-md bg-gray-300 px-10 py-2 text-gray-700 font-medium shadow transition hover:bg-gray-400"
               >
@@ -181,8 +166,7 @@ export function RegistrarVisitaPage({ onVolver }: Props) {
             </div>
           </div>
         );
-        
-      // --- PASO 3: ÉXITO ---
+
       case 'EXITO':
         return (
           <div className="flex flex-col items-center justify-center py-20 animate-fade-in">
@@ -191,8 +175,8 @@ export function RegistrarVisitaPage({ onVolver }: Props) {
                 La visita se ha registrado correctamente
               </p>
             </div>
-            <button 
-              onClick={onVolver} // Al salir, vuelve al Dashboard
+            <button
+              onClick={onVolver}
               className="mt-10 w-full max-w-xs rounded-md bg-[#8F9E78] py-2 text-white font-medium shadow-md hover:bg-[#7A8C60]"
             >
               Salir
@@ -206,10 +190,8 @@ export function RegistrarVisitaPage({ onVolver }: Props) {
     <div className="min-h-screen bg-white font-sans text-gray-800">
       <Header />
       <main className="mx-auto max-w-5xl px-4 py-8">
-        
-        {/* Título y Botón Volver */}
         <div className="mb-8 flex items-center gap-4">
-          <button 
+          <button
             onClick={step === 'BUSCAR_DNI' ? onVolver : handleReiniciar}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-[#6B9080] text-white transition hover:bg-[#4B593C]"
           >
@@ -219,23 +201,13 @@ export function RegistrarVisitaPage({ onVolver }: Props) {
           </button>
           <h1 className="text-2xl font-medium text-[#6B9080]">Registrar visita</h1>
         </div>
+        <BarProgress step={step}/>
 
-        {/* Barra de Progreso */}
-        <div className="mb-12 h-1.5 w-full rounded-full bg-gray-200">
-          <div 
-            className="h-1.5 rounded-full bg-[#4B6F44] transition-all duration-500"
-            style={{ width: step === 'BUSCAR_DNI' ? '33%' : step === 'REGISTRAR_DATOS' ? '66%' : '100%' }}
-          ></div>
-        </div>
-
-        {/* Mensaje de Error General */}
         {error && (
           <div className="mb-6 rounded-md border border-red-300 bg-red-100 p-4 text-center text-red-800">
             {error}
           </div>
         )}
-        
-        {/* Renderiza el paso actual */}
         {renderStep()}
       </main>
     </div>

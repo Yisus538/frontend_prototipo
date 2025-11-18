@@ -1,29 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, type ChangeEvent } from 'react';
 import { User, Lock, Eye, EyeOff } from 'lucide-react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import { type Usuario } from './App';
-import { useAuth } from './context/AuthContext'; // <-- 1. Importamos el Hook de Contexto
+import { useAuth } from './context/AuthContext';
+import { Logo } from './shared/components/Logo';
 
-// --- Componentes Visuales (Logo e Input) se mantienen igual ---
-const Logo = () => (
-  <div className="flex flex-col items-center mb-8">
-    <div className="flex w-full justify-center items-center space-x-4">
-      <div className="h-1.5 w-16 bg-white rounded-full"></div>
-      <div className="h-1.5 w-16 bg-white rounded-full"></div>
-    </div>
-    <h1 className="text-white text-3xl font-extrabold my-2 text-center tracking-wide">
-      BARRIO MILITAR
-    </h1>
-    <h2 className="text-white text-3xl font-extrabold text-center tracking-wide">
-      GENERAL DEHEZA
-    </h2>
-    <div className="flex w-full justify-center items-center space-x-4 mt-2">
-      <div className="h-1.5 w-16 bg-white rounded-full"></div>
-      <div className="h-1.5 w-16 bg-white rounded-full"></div>
-    </div>
-  </div>
-);
+
 
 type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   icon: React.ReactNode;
@@ -41,14 +23,9 @@ const InputConIcono = ({ icon, ...props }: InputProps) => (
   </div>
 );
 
-// --- 2. Quitamos las Props (ya no las necesitamos) ---
-// interface LoginPageProps {
-//   onLoginSuccess: (usuario: Usuario) => void;
-// }
-// export function LoginPage({ onLoginSuccess }: LoginPageProps) {
 
 export function LoginPage() {
-  const { login } = useAuth(); // <-- 3. Obtenemos la función 'login' del contexto
+  const { login } = useAuth();
   const [cuenta, setCuenta] = useState('');
   const [contrasena, setContrasena] = useState('');
   const [mostrarContrasena, setMostrarContrasena] = useState(false);
@@ -59,7 +36,7 @@ export function LoginPage() {
     setCargando(true);
 
     try {
-      const response = await axios.post('http://localhost:4000/api/login', {
+      const response = await axios.post('http://localhost:4000/api/auth/login', {
         cuenta,
         contrasena
       });
@@ -89,7 +66,6 @@ export function LoginPage() {
         mensajeError = 'Credenciales incorrectas. Verifique cuenta y contraseña.';
       }
 
-      // --- LOGIN FALLIDO (SweetAlert) ---
       Swal.fire({
         title: 'Acceso Denegado',
         text: mensajeError,
@@ -102,9 +78,10 @@ export function LoginPage() {
       setCargando(false);
     }
   };
-
+  const handleCuenta = (e: ChangeEvent<HTMLInputElement>) => { setCuenta(e.target.value) };
+  const handleContrasena = (e: ChangeEvent<HTMLInputElement>) => setContrasena(e.target.value)
+  
   return (
-    // --- Todo tu JSX se mantiene 100% igual ---
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#4B593C] p-4 font-sans">
       <Logo />
       <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-2xl">
@@ -119,7 +96,7 @@ export function LoginPage() {
               type="text"
               placeholder="Cuenta"
               value={cuenta}
-              onChange={(e) => setCuenta(e.target.value)}
+              onChange={handleCuenta}
               required
             />
             <div className="relative">
@@ -128,7 +105,7 @@ export function LoginPage() {
                 type={mostrarContrasena ? 'text' : 'password'}
                 placeholder="Contraseña"
                 value={contrasena}
-                onChange={(e) => setContrasena(e.target.value)}
+                onChange={handleContrasena}
                 required
               />
               <button
