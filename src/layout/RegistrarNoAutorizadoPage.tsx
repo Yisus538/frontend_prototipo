@@ -61,7 +61,7 @@ export function RegistrarNoAutorizadoPage({ onVolver }: Props) {
     setError(null);
 
     try {
-      const response = await fetch(`http://localhost:4000/api/no-autorizados`, {
+      const response = await fetch(`${API_ROUTES.noAutorizados}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -10,7 +10,7 @@ import { API_ROUTES } from '../apiConfig';
 
 
 export function RegistrarMoradorPage({ onVolver }: RegistrarTarjetaPageProps) {
-  const { token } = useAuth(); 
+  const { token } = useAuth();
   const [step, setStep] = useState<Step>('BUSCAR_DNI');
 
   const [dni, setDni] = useState('');
@@ -55,7 +55,7 @@ export function RegistrarMoradorPage({ onVolver }: RegistrarTarjetaPageProps) {
     setError(null);
 
     try {
-      await axios.post(`http://localhost:4000/api/moradores`, {
+      await axios.post(`${API_ROUTES.moradores}`, {
         dni,
         nombre,
         direccion,
@@ -67,7 +67,7 @@ export function RegistrarMoradorPage({ onVolver }: RegistrarTarjetaPageProps) {
         }
       });
 
-      setStep('EXITO'); 
+      setStep('EXITO');
 
     } catch (err: any) {
       if (err.response?.status === 409) {
@@ -202,7 +202,7 @@ export function RegistrarMoradorPage({ onVolver }: RegistrarTarjetaPageProps) {
               </p>
             </div>
             <button
-              onClick={onVolver} 
+              onClick={onVolver}
               className="mt-10 w-full max-w-xs rounded-md bg-[#8F9E78] py-2 text-white font-medium shadow-md hover:bg-[#7A8C60]"
             >
               Salir
@@ -229,7 +229,7 @@ export function RegistrarMoradorPage({ onVolver }: RegistrarTarjetaPageProps) {
           <h1 className="text-2xl font-medium text-[#6B9080]">Registrar Nuevo Morador</h1>
         </div>
 
-        <BarProgress step={step}/>
+        <BarProgress step={step} />
         {error && (
           <div className="mb-6 rounded-md border border-red-300 bg-red-100 p-4 text-center text-red-800">
             {error}

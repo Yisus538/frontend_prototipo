@@ -79,7 +79,7 @@ export function LoginPage() {
       setCargando(false);
     }
   };
-  const handleCuenta = (e: ChangeEvent<HTMLInputElement>) => { setCuenta(e.target.value) };
+  const handleCuenta = (e: ChangeEvent<HTMLInputElement>) => setCuenta(e.target.value) ;
   const handleContrasena = (e: ChangeEvent<HTMLInputElement>) => setContrasena(e.target.value)
   
   return (

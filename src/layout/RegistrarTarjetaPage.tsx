@@ -69,7 +69,7 @@ export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
 
 
     try {
-      await axios.post('http://localhost:4000/api/tarjetas', {
+      await axios.post(`${API_ROUTES.tarjetas}`, {
         idMorador: datosMorador?.id,
         patente: patente,
         numeroTarjeta: datosMorador?.numeroTarjeta

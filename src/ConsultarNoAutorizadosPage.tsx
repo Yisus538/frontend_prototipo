@@ -56,7 +56,6 @@ export function ConsultarNoAutorizadoPage({ onVolver }: Props) {
   };
 
   return (
-    // --- TU CÓDIGO JSX (SIN CAMBIOS) ---
     <div className="min-h-screen bg-white font-sans text-gray-800">
       <Header />
 
