@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Header } from './shared/components/Header';
-import { type NoAutorizado, type Props } from './interface/app.interface'; 
-import { useAuth } from './context/AuthContext'; 
+import { type NoAutorizado, type Props } from './interface/app.interface';
+import { useAuth } from './context/AuthContext';
 import { API_ROUTES } from './apiConfig';
 
-export function ConsultarNoAutorizadoPage({ onVolver }: Props) {
-  const { token } = useAuth(); 
+export const ConsultarNoAutorizadoPage = ({ onVolver }: Props) => {
+  const { token } = useAuth();
   const [dniBusqueda, setDniBusqueda] = useState('');
   const [haBuscado, setHaBuscado] = useState(false);
   const [resultado, setResultado] = useState<NoAutorizado | null>(null);
@@ -18,12 +18,12 @@ export function ConsultarNoAutorizadoPage({ onVolver }: Props) {
     setErrorApi(null);
 
     try {
-    
+
       const response = await fetch(`${API_ROUTES.noAutorizados}/${dniBusqueda}`, {
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
       });
 

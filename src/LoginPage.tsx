@@ -25,7 +25,7 @@ const InputConIcono = ({ icon, ...props }: InputProps) => (
 );
 
 
-export function LoginPage() {
+export const LoginPage = () => {
   const { login } = useAuth();
   const [cuenta, setCuenta] = useState('');
   const [contrasena, setContrasena] = useState('');
@@ -75,9 +75,9 @@ export function LoginPage() {
       setCargando(false);
     }
   };
-  const handleCuenta = (e: ChangeEvent<HTMLInputElement>) => setCuenta(e.target.value) ;
+  const handleCuenta = (e: ChangeEvent<HTMLInputElement>) => setCuenta(e.target.value);
   const handleContrasena = (e: ChangeEvent<HTMLInputElement>) => setContrasena(e.target.value)
-  
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#4B593C] p-4 font-sans">
       <Logo />

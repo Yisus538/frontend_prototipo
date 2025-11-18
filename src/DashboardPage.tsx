@@ -11,7 +11,7 @@ const MenuButton = ({ label, onClick }: { label: string; onClick: () => void; })
   </button>
 );
 
-export function DashboardPage({ onLogout, usuario, onNavegar }: DashboardPageProps) {
+export const DashboardPage = ({ onLogout, usuario, onNavegar }: DashboardPageProps) => {
   const [paginaActual, setPaginaActual] = useState(1);
 
   const opcionesAdmin: Record<number, string[]> = {
