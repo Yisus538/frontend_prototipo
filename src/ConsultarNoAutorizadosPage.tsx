@@ -1,163 +1,171 @@
-import React, { useState } from 'react';
-import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
-import axios from 'axios';
-import Swal from 'sweetalert2';
+import { useState } from 'react';
+import { Header } from './Header';
+import { type NoAutorizado } from './App'; // Importamos la interfaz
 
-// --- Interfaces ---
-interface ResultadoConsulta {
-  status: 'NO_AUTORIZADO' | 'AUTORIZADO' | 'NO_REGISTRADO';
-  dni: string;
-  nombre: string;
-  motivo?: string;
-  direccion?: string;
-}
-
-interface ConsultarNoAutorizadosPageProps {
+interface Props {
   onVolver: () => void;
 }
 
-// --- Componentes de UI (copiados de tu diseño) ---
-const ProgressBar = ({ step }: { step: number }) => {
-  const progressPercentage = (step / 2) * 100; // Solo 2 pasos
-  const width = Math.min(100, Math.max(0, progressPercentage));
-  return (
-    <div className="w-full bg-gray-300 rounded-full h-3 my-8">
-      <div
-        className="bg-gradient-to-r from-green-500 to-green-700 h-3 rounded-full transition-all duration-500 ease-out"
-        style={{ width: `${width}%` }}
-      ></div>
-    </div>
-  );
-};
+export function ConsultarNoAutorizadoPage({ onVolver }: Props) {
+  const [dniBusqueda, setDniBusqueda] = useState('');
+  const [haBuscado, setHaBuscado] = useState(false);
+  const [resultado, setResultado] = useState<NoAutorizado | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [errorApi, setErrorApi] = useState<string | null>(null);
 
-const InputLinea = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
-  <input
-    {...props}
-    className="w-full border-b-2 border-gray-300 bg-transparent py-3 text-lg text-gray-800 outline-none transition-colors focus:border-[#4B593C]"
-  />
-);
-
-const BotonPrincipal = ({ children, onClick, disabled }: { children: React.ReactNode, onClick?: () => void, disabled?: boolean }) => (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      type={onClick ? "button" : "submit"}
-      className="w-full rounded-lg bg-[#858a6a] py-4 text-lg font-bold text-white shadow-lg transition-all hover:bg-[#6c7052] hover:shadow-xl disabled:bg-gray-400 disabled:shadow-md"
-    >
-      {children}
-    </button>
-);
-
-
-// --- Componente Principal de la Página ---
-export function ConsultarNoAutorizadosPage({ onVolver }: ConsultarNoAutorizadosPageProps) {
-  const [step, setStep] = useState(1);
-  const [dni, setDni] = useState('');
-  const [cargando, setCargando] = useState(false);
-  const [resultado, setResultado] = useState<ResultadoConsulta | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!dni) return;
-    setCargando(true);
+  const handleBuscar = async () => {
+    if (!dniBusqueda) return;
+    setLoading(true);
+    setErrorApi(null); // Limpiamos errores previos
 
     try {
-      // Usamos la nueva ruta inteligente
-      const response = await axios.get(`http://localhost:4000/api/consultar-dni/${dni}`);
-      setResultado(response.data);
-      setStep(2); // Avanzamos al paso de resultados
-    } catch (err: any) {
-      console.error(err);
-      Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
+      // --- Conexión real al Backend ---
+      // Asumimos que tu backend corre en el puerto 3001
+      const response = await fetch(`http://localhost:4000/api/no-autorizados/${dniBusqueda}`);
+
+      if (response.ok) {
+        // Encontrado en la lista negra
+        const data: NoAutorizado = await response.json();
+        setResultado(data);
+      } else if (response.status === 404) {
+        // No encontrado en la lista negra (persona "limpia")
+        setResultado(null);
+      } else {
+        // Otro error del servidor
+        throw new Error('Error del servidor al buscar');
+      }
+
+      setHaBuscado(true);
+
+    } catch (error) {
+      console.error(error);
+      setErrorApi("Error al conectar con el servidor. ¿Está encendido?");
     } finally {
-      setCargando(false);
+      setLoading(false);
     }
   };
 
-  const handleSalir = () => {
-    setStep(1);
-    setDni('');
+  const handleReiniciar = () => {
+    setHaBuscado(false);
+    setDniBusqueda('');
     setResultado(null);
-    onVolver();
+    setErrorApi(null);
   };
 
   return (
-    <main className="flex-1 p-6 md:p-10">
-      <div className="mx-auto max-w-lg">
-        
+    <div className="min-h-screen bg-white font-sans text-gray-800">
+      <Header />
+
+      <main className="mx-auto max-w-5xl px-4 py-8">
+
         {/* Título y Botón Volver */}
-        <div className="flex items-center space-x-4 mb-4">
+        <div className="mb-8 flex items-center gap-4">
           <button
-            onClick={step > 1 ? () => setStep(1) : onVolver}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-green-200 text-green-700 transition-colors hover:bg-green-300"
+            onClick={onVolver}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#6B9080] text-white transition hover:bg-[#4B593C]"
+            aria-label="Volver al inicio"
           >
-            <ArrowLeft size={24} />
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
           </button>
-          <h1 className="text-3xl font-bold text-gray-700">Consultar no Autorizados</h1>
+          <h1 className="text-2xl font-medium text-[#6B9080]">Consultar no Autorizados</h1>
         </div>
 
-        <ProgressBar step={step} />
+        {/* Barra de Progreso Visual */}
+        <div className="mb-12 h-1.5 w-full rounded-full bg-gray-200">
+          <div className={`h-1.5 rounded-full bg-[#4B6F44] transition-all duration-500 ${haBuscado ? 'w-full' : 'w-1/2'}`}></div>
+        </div>
 
-        {/* --- PASO 1: INGRESAR DNI --- */}
-        {step === 1 && (
-          <div className="rounded-xl bg-white p-8 shadow-xl animate-fade-in">
-            <form onSubmit={handleSubmit}>
-              <label htmlFor="dni" className="block text-lg font-semibold text-gray-700 mb-2">Ingresar</label>
-              <InputLinea
-                id="dni"
-                value={dni}
-                onChange={(e) => setDni(e.target.value)}
-                placeholder="DNI"
-                type="number"
-              />
-              <div className="mt-8">
-                <BotonPrincipal disabled={!dni || cargando}>
-                  {cargando ? 'Consultando...' : 'Siguiente'}
-                </BotonPrincipal>
-              </div>
-            </form>
+        {/* Mensaje de Error de API */}
+        {errorApi && (
+          <div className="mb-4 rounded-md border border-red-300 bg-red-100 p-4 text-center text-red-800">
+            {errorApi}
           </div>
         )}
 
-        {/* --- PASO 2: MOSTRAR RESULTADO --- */}
-        {step === 2 && resultado && (
-          <div className="rounded-xl bg-white p-8 shadow-xl animate-fade-in">
-            <h2 className="text-lg font-semibold text-gray-700 mb-4">PERSONA</h2>
-            
-            {/* Datos de la persona */}
-            <div className="mb-6 space-y-2">
-              <p><strong>DNI:</strong> {resultado.dni}</p>
-              <p><strong>Nombre y Apellido:</strong> {resultado.nombre}</p>
-            </div>
+        {/* CONTENIDO DINÁMICO */}
+        {!haBuscado ? (
+          /* --- VISTA 1: INPUT DE BÚSQUEDA --- */
+          <div className="flex flex-col items-center justify-center py-10 animate-fade-in">
+            <div className="w-full max-w-md">
+              <label htmlFor="dni_input" className="mb-2 block text-sm font-bold text-[#2F3E20]">Ingresar</label>
+              <input
+                id="dni_input"
+                type="text"
+                placeholder="DNI"
+                className="w-full border-b-2 border-gray-300 py-2 text-lg outline-none focus:border-[#4B593C] placeholder-gray-400"
+                value={dniBusqueda}
+                onChange={(e) => setDniBusqueda(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleBuscar()}
+              />
 
-            {/* Mensaje de Estado (VERDE o ROJO) */}
-            {resultado.status === 'NO_AUTORIZADO' && (
-              <div className="rounded-lg bg-red-100 p-6 text-center text-2xl font-bold text-red-800 shadow-md">
-                <XCircle className="mx-auto mb-2 h-10 w-10" />
-                ¡ALERTA! La persona SE ENCUENTRA en la lista de no autorizados.
-                <p className="text-lg font-normal mt-2">Motivo: {resultado.motivo}</p>
+              <div className="mt-12 flex justify-center">
+                <button
+                  onClick={handleBuscar}
+                  disabled={!dniBusqueda || loading}
+                  className="rounded-md bg-[#8F9E78] px-12 py-2 text-white font-medium shadow-md transition hover:bg-[#7A8C60] disabled:opacity-50"
+                >
+                  {loading ? 'Buscando...' : 'Siguiente'}
+                </button>
               </div>
-            )}
-            
-            {(resultado.status === 'AUTORIZADO' || resultado.status === 'NO_REGISTRADO') && (
-              <div className="rounded-lg bg-green-100 p-6 text-center text-2xl font-bold text-green-800 shadow-md">
-                <CheckCircle className="mx-auto mb-2 h-10 w-10" />
-                La persona NO SE ENCUENTRA en la lista de no autorizados.
-                {resultado.status === 'AUTORIZADO' && (
-                   <p className="text-lg font-normal mt-2">Es un morador registrado.</p>
+            </div>
+          </div>
+        ) : (
+          /* --- VISTA 2: RESULTADOS --- */
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 pt-4 animate-fade-in">
+
+            {/* Columna Izquierda: Datos */}
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-sm font-bold uppercase text-[#2F3E20]">Persona</h3>
+                {resultado ? (
+                  // Si encontramos a alguien en la lista negra
+                  <div className="mt-4 space-y-2 text-lg">
+                    <p><span className="font-semibold">DNI:</span> {resultado.dni}</p>
+                    <p><span className="font-semibold">Nombre:</span> {resultado.nombre}</p>
+                    <p className="text-red-600"><span className="font-semibold text-black">Motivo:</span> {resultado.motivo}</p>
+                  </div>
+                ) : (
+                  // Si NO está en la lista negra (usamos datos input)
+                  <div className="mt-4 space-y-2 text-lg">
+                    <p><span className="font-semibold">DNI:</span> {dniBusqueda}</p>
+                    <p className="text-gray-500 italic">Sin datos registrados</p>
+                  </div>
                 )}
               </div>
-            )}
+            </div>
 
-            <div className="mt-10 max-w-xs mx-auto">
-              <BotonPrincipal onClick={handleSalir}>
+            {/* Columna Derecha: Caja de Estado */}
+            <div className="flex flex-col items-center justify-center space-y-8">
+
+              {resultado ? (
+                // CASO: ESTÁ EN LISTA NEGRA (ROJO)
+                <div className="flex w-full max-w-sm items-center justify-center rounded-xl bg-red-200 p-8 text-center shadow-sm">
+                  <p className="text-xl font-medium text-red-900">
+                    ¡ALERTA! <br /> La persona SE ENCUENTRA en la lista de no autorizados.
+                  </p>
+                </div>
+              ) : (
+                // CASO: NO ESTÁ EN LISTA NEGRA (VERDE - como tu foto)
+                <div className="flex w-full max-w-sm items-center justify-center rounded-xl bg-[#DFFFD6] p-8 text-center shadow-sm">
+                  <p className="text-xl font-medium text-green-900">
+                    La persona no se encuentra en la lista de no autorizados
+                  </p>
+                </div>
+              )}
+
+              <button
+                onClick={handleReiniciar} // O onVolver si prefieres salir directo
+                className="w-full max-w-xs rounded-md bg-[#8F9E78] py-2 text-white font-medium shadow-md hover:bg-[#7A8C60]"
+              >
                 Salir
-              </BotonPrincipal>
+              </button>
             </div>
           </div>
         )}
 
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

@@ -1,27 +1,22 @@
 import { useState } from 'react';
-import { type Usuario } from './App'; // Asegúrate de que la interfaz Usuario sea accesible
+import { type Usuario, type Vista } from './App';
 import { Header } from './Header';
 
-// --- CAMBIO 1: MenuButton ahora acepta un onClick ---
 const MenuButton = ({ label, onClick }: { label: string; onClick: () => void; }) => (
-  <button 
-    onClick={onClick} 
+  <button
+    onClick={onClick}
     className="w-full transform rounded-lg bg-white py-5 text-left text-xl font-bold text-black shadow-sm transition-all hover:scale-[1.01] hover:shadow-md border border-transparent hover:border-gray-200 px-8 mb-4 last:mb-0"
   >
     {label}
   </button>
 );
 
-// --- Componente Principal ---
-
-// --- CAMBIO 2: Añadimos la prop 'onNavegar' a la interfaz ---
 interface DashboardPageProps {
   onLogout: () => void;
   usuario: Usuario;
-  onNavegar: (vista: 'registrar_tarjeta') => void; // Tipo de vista de App.tsx
+  onNavegar: (vista: Vista) => void;
 }
 
-// --- CAMBIO 3: Recibimos 'onNavegar' en las props ---
 export function DashboardPage({ onLogout, usuario, onNavegar }: DashboardPageProps) {
   const [paginaActual, setPaginaActual] = useState(1);
 
@@ -48,13 +43,20 @@ export function DashboardPage({ onLogout, usuario, onNavegar }: DashboardPagePro
     setPaginaActual((prev) => Math.max(prev - 1, 1));
   };
 
-  // --- CAMBIO 4: Creamos un manejador de clicks ---
   const handleMenuClick = (opcion: string) => {
-    // Si la opción es "Registrar Tarjeta", usamos la navegación
     if (opcion === "Registrar Tarjeta") {
       onNavegar('registrar_tarjeta');
-    } else {
-      // Para las otras opciones, solo mostramos en consola por ahora
+    }
+    else if (opcion === "Consultar no Autorizado") {
+      onNavegar('consultar_no_autorizado');
+    }
+    // 3. AGREGA ESTA CONDICIÓN
+    else if (opcion === "Registrar Visita") {
+      onNavegar('registrar_visita');
+    } else if (opcion === "Registrar no Autorizado") {
+      onNavegar('registrar_no_autorizado');
+    }
+    else {
       console.log("Opción seleccionada:", opcion);
       alert(`Funcionalidad "${opcion}" no implementada aún.`);
     }
@@ -104,12 +106,11 @@ export function DashboardPage({ onLogout, usuario, onNavegar }: DashboardPagePro
               className="rounded-2xl bg-gray-100/50 p-8 shadow-[0_0_15px_rgba(0,0,0,0.1)] 
                          animate-fade-in-right"
             >
-              {/* --- CAMBIO 5: Pasamos la función 'handleMenuClick' al 'onClick' del botón --- */}
               {menuItems && menuItems.map((item, index) => (
-                <MenuButton 
-                  key={item + index} 
-                  label={item} 
-                  onClick={() => handleMenuClick(item)} 
+                <MenuButton
+                  key={item + index}
+                  label={item}
+                  onClick={() => handleMenuClick(item)}
                 />
               ))}
               {!menuItems || menuItems.length === 0 && (
