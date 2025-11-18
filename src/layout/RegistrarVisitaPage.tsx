@@ -23,7 +23,7 @@ export function RegistrarVisitaPage({ onVolver }: Props) {
     setError(null);
 
     try {
-      const response = await fetch(`${API_ROUTES.noAutorizados}/${dni}`, {
+      const response = await fetch(`${API_ROUTES.noAutorizados}/${dni}`,{
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
