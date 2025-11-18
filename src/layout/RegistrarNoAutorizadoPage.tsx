@@ -3,6 +3,7 @@ import { Header } from '../shared/components/Header';
 import { useAuth } from '../context/AuthContext';
 import type { Props, Step } from '../interface/noAutorizado.interface';
 import { BarProgress } from '../shared/components/BarProgress';
+import { API_ROUTES } from '../apiConfig';
 
 
 
@@ -27,7 +28,7 @@ export function RegistrarNoAutorizadoPage({ onVolver }: Props) {
 
     try {
 
-      const response = await fetch(`http://localhost:4000/api/no-autorizados/${dni}`, {
+      const response = await fetch(`${API_ROUTES.noAutorizados}/${dni}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

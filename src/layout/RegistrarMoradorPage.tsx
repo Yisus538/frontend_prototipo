@@ -5,6 +5,7 @@ import axios from 'axios';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
 import type { RegistrarTarjetaPageProps, Step } from '../interface/morador.interface';
 import { BarProgress } from '../shared/components/BarProgress';
+import { API_ROUTES } from '../apiConfig';
 
 
 
@@ -26,7 +27,7 @@ export function RegistrarMoradorPage({ onVolver }: RegistrarTarjetaPageProps) {
     setError(null);
 
     try {
-      await axios.get(`http://localhost:4000/api/moradores/${dni}`, {
+      await axios.get(`${API_ROUTES.moradores}/${dni}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 

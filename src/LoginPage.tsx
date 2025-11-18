@@ -4,6 +4,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { useAuth } from './context/AuthContext';
 import { Logo } from './shared/components/Logo';
+import { API_ROUTES } from './apiConfig';
 
 
 
@@ -36,7 +37,7 @@ export function LoginPage() {
     setCargando(true);
 
     try {
-      const response = await axios.post('http://localhost:4000/api/auth/login', {
+      const response = await axios.post(API_ROUTES.login, {
         cuenta,
         contrasena
       });

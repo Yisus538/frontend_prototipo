@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import type { MoradorData, RegistrarTarjetaPageProps } from '../interface/morador.interface';
+import { API_ROUTES } from '../apiConfig';
 
 
 
@@ -41,7 +42,7 @@ export function RegistrarTarjetaPage({ onVolver }: RegistrarTarjetaPageProps) {
     // --- BÚSQUEDA DE API REAL CON TOKEN ---
     try {
       // 4. Añadir token al header
-      const response = await axios.get(`http://localhost:4000/api/moradores/${idMorador}`, {
+      const response = await axios.get(`${API_ROUTES.moradores}/${idMorador}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

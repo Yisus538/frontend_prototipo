@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Header } from './shared/components/Header';
 import { type NoAutorizado, type Props } from './interface/app.interface'; 
 import { useAuth } from './context/AuthContext'; 
+import { API_ROUTES } from './apiConfig';
 
 export function ConsultarNoAutorizadoPage({ onVolver }: Props) {
   const { token } = useAuth(); 
@@ -18,7 +19,7 @@ export function ConsultarNoAutorizadoPage({ onVolver }: Props) {
 
     try {
     
-      const response = await fetch(`http://localhost:4000/api/no-autorizados/${dniBusqueda}`, {
+      const response = await fetch(`${API_ROUTES.noAutorizados}/${dniBusqueda}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

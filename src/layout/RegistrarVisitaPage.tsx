@@ -3,6 +3,7 @@ import { Header } from '../shared/components/Header';
 import { useAuth } from '../context/AuthContext';
 import type { Props, Step } from '../interface/noAutorizado.interface';
 import { BarProgress } from '../shared/components/BarProgress';
+import { API_ROUTES } from '../apiConfig';
 
 
 export function RegistrarVisitaPage({ onVolver }: Props) {
@@ -22,7 +23,7 @@ export function RegistrarVisitaPage({ onVolver }: Props) {
     setError(null);
 
     try {
-      const response = await fetch(`http://localhost:4000/api/no-autorizados/${dni}`, {
+      const response = await fetch(`${API_ROUTES.noAutorizados}/${dni}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -201,7 +202,7 @@ export function RegistrarVisitaPage({ onVolver }: Props) {
           </button>
           <h1 className="text-2xl font-medium text-[#6B9080]">Registrar visita</h1>
         </div>
-        <BarProgress step={step}/>
+        <BarProgress step={step} />
 
         {error && (
           <div className="mb-6 rounded-md border border-red-300 bg-red-100 p-4 text-center text-red-800">
